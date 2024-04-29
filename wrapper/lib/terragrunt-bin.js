@@ -1,4 +1,8 @@
 /**
+ * Modified to work for Terragrunt
+ * Original source code available at https://github.com/hashicorp/setup-terraform
+ *
+ * Original code license:
  * Copyright (c) HashiCorp, Inc.
  * SPDX-License-Identifier: MPL-2.0
  */
@@ -10,5 +14,5 @@ module.exports = (() => {
   // If we're on Windows, then the executable ends with .exe
   const exeSuffix = os.platform().startsWith('win') ? '.exe' : '';
 
-  return [process.env.TERRAFORM_CLI_PATH, `terraform-bin${exeSuffix}`].join(path.sep);
+  return [process.env.TERRAGRUNT_CLI_PATH, `terragrunt-bin${exeSuffix}`].join(path.sep);
 })();

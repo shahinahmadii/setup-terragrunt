@@ -27578,6 +27578,10 @@ module.exports = {
 /***/ ((module) => {
 
 /**
+ * Modified to work for Terragrunt
+ * Original source code available at https://github.com/hashicorp/setup-terraform
+ *
+ * Original code license:
  * Copyright (c) HashiCorp, Inc.
  * SPDX-License-Identifier: MPL-2.0
  */
@@ -27622,10 +27626,14 @@ module.exports = OutputListener;
 
 /***/ }),
 
-/***/ 650:
+/***/ 5828:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 /**
+ * Modified to work for Terragrunt
+ * Original source code available at https://github.com/hashicorp/setup-terraform
+ *
+ * Original code license:
  * Copyright (c) HashiCorp, Inc.
  * SPDX-License-Identifier: MPL-2.0
  */
@@ -27637,7 +27645,7 @@ module.exports = (() => {
   // If we're on Windows, then the executable ends with .exe
   const exeSuffix = os.platform().startsWith('win') ? '.exe' : '';
 
-  return [process.env.TERRAFORM_CLI_PATH, `terraform-bin${exeSuffix}`].join(path.sep);
+  return [process.env.TERRAGRUNT_CLI_PATH, `terragrunt-bin${exeSuffix}`].join(path.sep);
 })();
 
 
@@ -27925,6 +27933,10 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 /**
+ * Modified to work for Terragrunt
+ * Original source code available at https://github.com/hashicorp/setup-terraform
+ *
+ * Original code license:
  * Copyright (c) HashiCorp, Inc.
  * SPDX-License-Identifier: MPL-2.0
  */
@@ -27934,17 +27946,17 @@ const core = __nccwpck_require__(2186);
 const { exec } = __nccwpck_require__(1514);
 
 const OutputListener = __nccwpck_require__(8320);
-const pathToCLI = __nccwpck_require__(650);
+const pathToCLI = __nccwpck_require__(5828);
 
-async function checkTerraform () {
-  // Setting check to `true` will cause `which` to throw if terraform isn't found
+async function checkTerragrunt () {
+  // Setting check to `true` will cause `which` to throw if terragrunt isn't found
   const check = true;
   return io.which(pathToCLI, check);
 }
 
 (async () => {
-  // This will fail if Terraform isn't found, which is what we want
-  await checkTerraform();
+  // This will fail if Terragrunt isn't found, which is what we want
+  await checkTerragrunt();
 
   // Create listeners to receive output (in memory) as well
   const stdout = new OutputListener();
@@ -27954,7 +27966,7 @@ async function checkTerraform () {
     stderr: stderr.listener
   };
 
-  // Execute terraform and capture output
+  // Execute terragrunt and capture output
   const args = process.argv.slice(2);
   const options = {
     listeners,
@@ -27981,7 +27993,7 @@ async function checkTerraform () {
   }
 
   // A non-zero exitCode is considered an error
-  core.setFailed(`Terraform exited with code ${exitCode}.`);
+  core.setFailed(`Terragrunt exited with code ${exitCode}.`);
 })();
 
 })();

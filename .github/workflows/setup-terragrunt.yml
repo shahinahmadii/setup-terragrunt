@@ -1,0 +1,372 @@
+name: 'setup-terragrunt tests'
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  terragrunt-versions:
+    name: 'Terragrunt Versions'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        terragrunt-versions: [0.11.14, latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt - ${{ matrix['terragrunt-versions'] }}
+      uses: ./
+      with:
+        terragrunt_version: ${{ matrix['terragrunt-versions'] }}
+
+    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
+      if: ${{ matrix['terragrunt-versions'] != 'latest' }}
+      run: terragrunt version | grep ${{ matrix['terragrunt-versions']}}
+
+    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
+      if: ${{ matrix['terragrunt-versions'] == 'latest' }}
+      run: terragrunt version | grep 'Terragrunt v'
+
+  terragrunt-versions-no-wrapper:
+    name: 'Terragrunt Versions No Wrapper'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        terragrunt-versions: [0.11.14, latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt (no wrapper) - ${{ matrix['terragrunt-versions'] }}
+      uses: ./
+      with:
+        terragrunt_version: ${{ matrix['terragrunt-versions'] }}
+        terragrunt_wrapper: false
+
+    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
+      if: ${{ matrix['terragrunt-versions'] != 'latest' }}
+      run: terragrunt version | grep ${{ matrix['terragrunt-versions']}}
+
+    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
+      if: ${{ matrix['terragrunt-versions'] == 'latest' }}
+      run: terragrunt version | grep 'Terragrunt v'
+
+  terragrunt-versions-constraints:
+    name: 'Terragrunt Versions Constraints'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        terragrunt-versions: [~0.12, 0.12.x, <0.13.0]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt - ${{ matrix['terragrunt-versions'] }}
+      uses: ./
+      with:
+        terragrunt_version: ${{ matrix['terragrunt-versions'] }}
+
+    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
+      run: terragrunt version | grep 'Terragrunt v0\.12'
+
+  terragrunt-versions-constraints-no-wrapper:
+    name: 'Terragrunt Versions Constraints No Wrapper'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        terragrunt-versions: [~0.12, 0.12.x, <0.13.0]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt (no wrapper) - ${{ matrix['terragrunt-versions'] }}
+      uses: ./
+      with:
+        terragrunt_version: ${{ matrix['terragrunt-versions'] }}
+        terragrunt_wrapper: false
+
+    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
+      run: terragrunt version | grep 'Terragrunt v0\.12'
+
+  terragrunt-credentials-cloud:
+    name: 'Terragrunt Cloud Credentials'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      TF_CLOUD_API_TOKEN: 'XXXXXXXXXXXXXX.atlasv1.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+      with:
+        cli_config_credentials_token: ${{ env.TF_CLOUD_API_TOKEN }}
+
+    - name: Validate Terragrunt Credentials (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cat ${APPDATA}/terragrunt.rc | grep 'credentials "app.terragrunt.io"'
+        cat ${APPDATA}/terragrunt.rc | grep 'token = "${{ env.TF_CLOUD_API_TOKEN }}"'
+
+    - name: Validate Teraform Credentials (Linux & macOS)
+      if: runner.os != 'Windows'
+      run: |
+        cat ${HOME}/.terragruntrc | grep 'credentials "app.terragrunt.io"'
+        cat ${HOME}/.terragruntrc | grep 'token = "${{ env.TF_CLOUD_API_TOKEN }}"'
+
+  terragrunt-credentials-enterprise:
+    name: 'Terragrunt Enterprise Credentials'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      TF_CLOUD_API_TOKEN: 'XXXXXXXXXXXXXX.atlasv1.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+      with:
+        cli_config_credentials_hostname: 'terragrunt.example.com'
+        cli_config_credentials_token: ${{ env.TF_CLOUD_API_TOKEN }}
+
+    - name: Validate Terragrunt Credentials (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cat ${APPDATA}/terragrunt.rc | grep 'credentials "terragrunt.example.com"'
+        cat ${APPDATA}/terragrunt.rc | grep 'token = "${{ env.TF_CLOUD_API_TOKEN }}"'
+
+    - name: Validate Teraform Credentials (Linux & macOS)
+      if: runner.os != 'Windows'
+      run: |
+        cat ${HOME}/.terragruntrc | grep 'credentials "terragrunt.example.com"'
+        cat ${HOME}/.terragruntrc | grep 'token = "${{ env.TF_CLOUD_API_TOKEN }}"'
+
+  terragrunt-credentials-none:
+    name: 'Terragrunt No Credentials'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+
+    - name: Validate Terragrunt Credentials (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        [[ -f ${APPDATA}/terragrunt.rc ]] || exit 0
+
+    - name: Validate Teraform Credentials (Linux & macOS)
+      if: runner.os != 'Windows'
+      run: |
+        [[ -f ${HOME}/.terragruntrc ]] || exit 0
+
+  terragrunt-arguments:
+    name: 'Terragrunt Arguments'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+
+    - name: Check No Arguments
+      run: terragrunt || exit 0
+
+    - name: Check Single Argument
+      run: terragrunt help || exit 0
+
+    - name: Check Single Argument Hyphen
+      run: terragrunt -help
+
+    - name: Check Single Argument Double Hyphen
+      run: terragrunt --help
+
+    - name: Check Single Argument Subcommand
+      run: terragrunt fmt -check
+
+    - name: Check Multiple Arguments Subcommand
+      run: terragrunt fmt -check -list=true -no-color
+
+  terragrunt-arguments-no-wrapper:
+    name: 'Terragrunt Arguments No Wrapper'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+      with:
+        terragrunt_wrapper: false
+
+    - name: Check No Arguments
+      run: terragrunt || exit 0
+
+    - name: Check Single Argument
+      run: terragrunt help || exit 0
+
+    - name: Check Single Argument Hyphen
+      run: terragrunt -help
+
+    - name: Check Single Argument Double Hyphen
+      run: terragrunt --help
+
+    - name: Check Single Argument Subcommand
+      run: terragrunt fmt -check
+
+    - name: Check Multiple Arguments Subcommand
+      run: terragrunt fmt -check -list=true -no-color
+
+  terragrunt-run-local:
+    name: 'Terragrunt Run Local'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./.github/workflows/data/local
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+
+    - name: Terragrunt Init
+      run: terragrunt init
+
+    - name: Terragrunt Format
+      run: terragrunt fmt -check
+
+    - name: Terragrunt Plan
+      id: plan
+      run: terragrunt plan
+
+    - name: Print Terragrunt Plan
+      run: echo "${{ steps.plan.outputs.stdout }}"
+
+  terragrunt-run-local-no-wrapper:
+    name: 'Terragrunt Run Local No Wrapper'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./.github/workflows/data/local
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+      with:
+        terragrunt_wrapper: false
+
+    - name: Terragrunt Init
+      run: terragrunt init
+
+    - name: Terragrunt Format
+      run: terragrunt fmt -check
+
+    - name: Terragrunt Plan
+      id: plan
+      run: terragrunt plan
+
+
+  terragrunt-stdout-wrapper:
+    name: 'Terragrunt STDOUT'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./.github/workflows/data/local
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+      with:
+        terragrunt_wrapper: true
+
+    - name: Terragrunt Init
+      run: terragrunt init
+
+    - name: Terragrunt Format
+      run: terragrunt fmt -check
+
+    - name: Terragrunt Apply
+      id: apply
+      run: terragrunt apply -auto-approve
+
+    - name: Terragrunt Output to JQ
+      id: output
+      run: terragrunt output -json | jq '.pet.value'
+
+  terragrunt-stdout-no-wrapper:
+    name: 'Terragrunt STDOUT No Wrapper'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./.github/workflows/data/local
+    steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Setup Terragrunt
+      uses: ./
+      with:
+        terragrunt_wrapper: false
+
+    - name: Terragrunt Init
+      run: terragrunt init
+
+    - name: Terragrunt Format
+      run: terragrunt fmt -check
+
+    - name: Terragrunt Apply
+      id: apply
+      run: terragrunt apply -auto-approve
+
+    - name: Terragrunt Output to JQ
+      id: output
+      run: terragrunt output -json | jq '.pet.value'

@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 /**
+ * Modified to work for Terragrunt
+ * Original source code available at https://github.com/hashicorp/setup-terraform
+ *
+ * Original code license:
  * Copyright (c) HashiCorp, Inc.
  * SPDX-License-Identifier: MPL-2.0
  */
@@ -9,17 +13,17 @@ const core = require('@actions/core');
 const { exec } = require('@actions/exec');
 
 const OutputListener = require('./lib/output-listener');
-const pathToCLI = require('./lib/terraform-bin');
+const pathToCLI = require('./lib/terragrunt-bin');
 
-async function checkTerraform () {
-  // Setting check to `true` will cause `which` to throw if terraform isn't found
+async function checkTerragrunt () {
+  // Setting check to `true` will cause `which` to throw if terragrunt isn't found
   const check = true;
   return io.which(pathToCLI, check);
 }
 
 (async () => {
-  // This will fail if Terraform isn't found, which is what we want
-  await checkTerraform();
+  // This will fail if Terragrunt isn't found, which is what we want
+  await checkTerragrunt();
 
   // Create listeners to receive output (in memory) as well
   const stdout = new OutputListener();
@@ -29,7 +33,7 @@ async function checkTerraform () {
     stderr: stderr.listener
   };
 
-  // Execute terraform and capture output
+  // Execute terragrunt and capture output
   const args = process.argv.slice(2);
   const options = {
     listeners,
@@ -56,5 +60,5 @@ async function checkTerraform () {
   }
 
   // A non-zero exitCode is considered an error
-  core.setFailed(`Terraform exited with code ${exitCode}.`);
+  core.setFailed(`Terragrunt exited with code ${exitCode}.`);
 })();

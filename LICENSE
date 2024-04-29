@@ -1,3 +1,7 @@
+Modified to work for Terragrunt
+Original source code available at https://github.com/hashicorp/setup-terraform
+
+Original code license:
 Copyright (c) 2020 HashiCorp, Inc.
 
 Mozilla Public License Version 2.0

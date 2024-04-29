@@ -4,7 +4,7 @@ changelogPath: CHANGELOG.md
 versionExt: md
 versionFormat: '## {{.Version}} ({{.Time.Format "2006-01-02"}})'
 kindFormat: '{{.Kind}}:'
-changeFormat: '* {{.Body}} ([#{{.Custom.Issue}}](https://github.com/hashicorp/setup-terraform/issues/{{.Custom.Issue}}))'
+changeFormat: '* {{.Body}} ([#{{.Custom.Issue}}](https://github.com/01011111/setup-terragrunt/issues/{{.Custom.Issue}}))'
 custom:
   - key: Issue
     label: Issue/PR Number
