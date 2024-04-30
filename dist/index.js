@@ -105,8 +105,8 @@ async function installWrapper (pathToCLI) {
     throw e;
   }
 
-  // Export a new environment variable, so our wrapper can locate the binary
-  core.exportVariable('TERRAGRUNT_CLI_PATH', '');
+  // Add binary to path so we can find it
+  core.addPath([`terragrunt-bin${exeSuffix}`].join(path.sep));
 }
 
 async function run () {
