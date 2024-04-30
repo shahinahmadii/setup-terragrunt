@@ -77,23 +77,25 @@ async function downloadCLI (url) {
   return pathToCLI;
 }
 
-async function installWrapper (pathToCLI, cachedPath) {
-  let source, target;
+async function installWrapper (pathToCLI) {
+  let source, target, wrapperPath;
 
   // Install our wrapper as terragrunt
   try {
     source = __nccwpck_require__.ab + "index1.js";
-    target = [pathToCLI].join(path.sep);
+    target = path.resolve([__dirname, '..', 'wrapper', 'terragrunt'].join(path.sep));
     core.debug(`Copying ${source} to ${target}.`);
     await io.cp(__nccwpck_require__.ab + "index1.js", target);
-    await fs.chmod(pathToCLI, '755');
+    wrapperPath = target;
   } catch (e) {
     core.error(`Unable to copy ${source} to ${target}.`);
     throw e;
   }
 
-  // Set the path to the Terragrunt binary
-  core.exportVariable('TERRAGRUNT_BIN', cachedPath);
+  // Export a new environment variable, so our wrapper can locate the binary
+  core.exportVariable('TERRAFORM_CLI_PATH', pathToCLI);
+
+  return wrapperPath;
 }
 
 async function run () {
@@ -125,19 +127,26 @@ async function run () {
       throw new Error(`Terragrunt version ${version} not available for ${platform} and ${arch}`);
     }
 
-    // Download requested version
-    const pathToCLI = await downloadCLI(build.browser_download_url);
+    let pathToCLI = '';
 
-    const cachedPath = await tc.cacheFile(pathToCLI, 'terragrunt', 'terragrunt', release.tag_name);
+    const localPath = tc.find('terragrunt', release.tag_name);
+    if (localPath) {
+      core.debug(`Terragrunt found in cache at ${localPath}`);
+      pathToCLI = localPath;
+    } else {
+      core.debug('Terragrunt not found in cache');
+      // Download requested version
+      const downloadPath = await downloadCLI(build.browser_download_url);
+      pathToCLI = await tc.cacheFile(downloadPath, 'terragrunt', 'terragrunt', release.tag_name);
+    }
 
     // Install our wrapper
     if (wrapper) {
-      await installWrapper(pathToCLI, cachedPath);
-      core.debug(`Adding to path: ${pathToCLI}`);
-      core.addPath(pathToCLI);
+      const wrapperPath = await installWrapper(pathToCLI);
+      core.addPath(wrapperPath);
     } else {
-      core.debug(`Adding to path: ${cachedPath}`);
-      core.addPath(cachedPath);
+      // Add to path
+      core.addPath(pathToCLI);
     }
 
     return release;
