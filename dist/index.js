@@ -20,7 +20,7 @@ const semver = __nccwpck_require__(1383);
 const fs = (__nccwpck_require__(7147).promises);
 
 // External
-const { Octokit } = process.env.GITHUB_ACTION ? __nccwpck_require__(1231) : __nccwpck_require__(5375);
+const { Octokit } = process.env.GITHUB_ACTIONS ? __nccwpck_require__(1231) : __nccwpck_require__(5375);
 const core = __nccwpck_require__(2186);
 const tc = __nccwpck_require__(7784);
 const io = __nccwpck_require__(7436);
@@ -28,7 +28,7 @@ const io = __nccwpck_require__(7436);
 const octokitOptions = {
   userAgent: 'GitHub Action 01011111/setup-terragrunt'
 };
-if (!process.env.GITHUB_ACTION && process.env.GITHUB_TOKEN !== '') { octokitOptions.auth = process.env.GITHUB_TOKEN; }
+if (!process.env.GITHUB_ACTIONS && process.env.GITHUB_TOKEN) { octokitOptions.auth = process.env.GITHUB_TOKEN; }
 const octokit = new Octokit(octokitOptions);
 
 // arch in [arm, x32, x64...] (https://nodejs.org/api/os.html#os_os_arch)
