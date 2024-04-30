@@ -85,8 +85,8 @@ async function installWrapper (pathToCLI) {
 
   // Rename terragrunt(.exe) to terragrunt-bin(.exe)
   try {
-    source = [pathToCLI, `terragrunt${exeSuffix}`].join(path.sep);
-    target = [pathToCLI, `terragrunt-bin${exeSuffix}`].join(path.sep);
+    source = [`terragrunt${exeSuffix}`].join(path.sep);
+    target = [`terragrunt-bin${exeSuffix}`].join(path.sep);
     core.debug(`Moving ${source} to ${target}.`);
     await io.mv(source, target);
   } catch (e) {
@@ -97,7 +97,7 @@ async function installWrapper (pathToCLI) {
   // Install our wrapper as terragrunt
   try {
     source = __nccwpck_require__.ab + "index1.js";
-    target = [pathToCLI, 'terragrunt'].join(path.sep);
+    target = ['terragrunt'].join(path.sep);
     core.debug(`Copying ${source} to ${target}.`);
     await io.cp(__nccwpck_require__.ab + "index1.js", target);
   } catch (e) {
@@ -106,7 +106,7 @@ async function installWrapper (pathToCLI) {
   }
 
   // Export a new environment variable, so our wrapper can locate the binary
-  core.exportVariable('TERRAGRUNT_CLI_PATH', pathToCLI);
+  core.exportVariable('TERRAGRUNT_CLI_PATH', '');
 }
 
 async function run () {
