@@ -1,5 +1,5 @@
-name: 'Setup Terragrunt'
-description: 'Sets up TTerragrunt CLI in your GitHub Actions workflow.'
+name: '01011111 - Setup Terragrunt'
+description: 'Sets up Terragrunt CLI in your GitHub Actions workflow.'
 author: '01011111'
 inputs:
   terragrunt_version:
@@ -9,7 +9,6 @@ inputs:
     description: 'Whether or not to install a wrapper to wrap subsequent calls of the `terragrunt` binary and expose its STDOUT, STDERR, and exit code as outputs named `stdout`, `stderr`, and `exitcode` respectively. Defaults to `true`.'
     default: 'true'
     required: false
-
 runs:
   using: 'node20'
   main: 'dist/index.js'
