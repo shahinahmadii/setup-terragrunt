@@ -107,8 +107,8 @@ jobs:
           git config --global user.name "CTRLALTDEV Bot"
           git tag "${{ inputs.versionNumber }}"
           git tag -f "${{ needs.major-version.outputs.version }}"
-          git push "git@github.com/${{ github.repository }}.git" "${{ inputs.versionNumber }}"
-          git push "git@github.com/${{ github.repository }}.git" -f "${{ needs.major-version.outputs.version }}"
+          git push "git@github.com:${{ github.repository }}.git" "${{ inputs.versionNumber }}"
+          git push "git@github.com:${{ github.repository }}.git" -f "${{ needs.major-version.outputs.version }}"
 
   release:
     needs: [ changelog-version, release-tag ]
