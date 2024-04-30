@@ -27638,14 +27638,10 @@ module.exports = OutputListener;
  * SPDX-License-Identifier: MPL-2.0
  */
 
-const os = __nccwpck_require__(2037);
 const path = __nccwpck_require__(1017);
 
 module.exports = (() => {
-  // If we're on Windows, then the executable ends with .exe
-  const exeSuffix = os.platform().startsWith('win') ? '.exe' : '';
-
-  return [`terragrunt-bin${exeSuffix}`].join(path.sep);
+  return [process.env.TERRAGRUNT_BIN].join(path.sep);
 })();
 
 
