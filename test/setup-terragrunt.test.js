@@ -219,8 +219,6 @@ describe('Setup Terragrunt', () => {
     const version = '0.57.13';
     const wrapperPath = path.resolve([__dirname, '..', 'wrapper', 'dist', 'index.js'].join(path.sep));
 
-    const ioMv = jest.spyOn(io, 'mv')
-      .mockImplementation(() => {});
     const ioCp = jest.spyOn(io, 'cp')
       .mockImplementation(() => {});
 
@@ -247,16 +245,13 @@ describe('Setup Terragrunt', () => {
 
     await setup();
 
-    expect(ioMv).toHaveBeenCalledWith(`file${path.sep}terragrunt`, `file${path.sep}terragrunt-bin`);
-    expect(ioCp).toHaveBeenCalledWith(wrapperPath, `file${path.sep}terragrunt`);
+    expect(ioCp).toHaveBeenCalledWith(wrapperPath, path.resolve([__dirname, '..', 'terragrunt'].join(path.sep)));
   });
 
   test('installs wrapper on windows', async () => {
     const version = '0.57.13';
     const wrapperPath = path.resolve([__dirname, '..', 'wrapper', 'dist', 'index.js'].join(path.sep));
 
-    const ioMv = jest.spyOn(io, 'mv')
-      .mockImplementation(() => {});
     const ioCp = jest.spyOn(io, 'cp')
       .mockImplementation(() => {});
 
@@ -283,7 +278,6 @@ describe('Setup Terragrunt', () => {
 
     await setup();
 
-    expect(ioMv).toHaveBeenCalledWith(`file${path.sep}terragrunt.exe`, `file${path.sep}terragrunt-bin.exe`);
-    expect(ioCp).toHaveBeenCalledWith(wrapperPath, `file${path.sep}terragrunt`);
+    expect(ioCp).toHaveBeenCalledWith(wrapperPath, path.resolve([__dirname, '..', 'terragrunt'].join(path.sep)));
   });
 });
