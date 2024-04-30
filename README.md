@@ -1,74 +1,64 @@
-# setup-terraform
+# setup-terragrunt
 
 [![Continuous Integration](https://github.com/01011111/setup-terragrunt/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/01011111/setup-terragrunt/actions/workflows/continuous-integration.yml)
-[![Setup Terraform](https://github.com/01011111/setup-terragrunt/actions/workflows/setup-terraform.yml/badge.svg)](https://github.com/01011111/setup-terragrunt/actions/workflows/setup-terraform.yml)
+[![Setup Terragrunt](https://github.com/01011111/setup-terragrunt/actions/workflows/setup-terragrunt.yml/badge.svg)](https://github.com/01011111/setup-terragrunt/actions/workflows/setup-terragrunt.yml)
 
-The `01011111/setup-terragrunt` action is a JavaScript action that sets up Terraform CLI in your GitHub Actions workflow by:
+The `01011111/setup-terragrunt` action is a JavaScript action that sets up Terragrunt CLI in your GitHub Actions workflow by:
 
-- Downloading a specific version of Terraform CLI and adding it to the `PATH`.
-- Configuring the [Terraform CLI configuration file](https://www.terraform.io/docs/commands/cli-config.html) with a Terraform Cloud/Enterprise hostname and API token.
-- Installing a wrapper script to wrap subsequent calls of the `terraform` binary and expose its STDOUT, STDERR, and exit code as outputs named `stdout`, `stderr`, and `exitcode` respectively. (This can be optionally skipped if subsequent steps in the same job do not need to access the results of Terraform commands.)
+- Downloading a specific version of Terragrunt CLI and adding it to the `PATH`.
+- Installing a wrapper script to wrap subsequent calls of the `terragrunt` binary and expose its STDOUT, STDERR, and exit code as outputs named `stdout`, `stderr`, and `exitcode` respectively. (This can be optionally skipped if subsequent steps in the same job do not need to access the results of Terragrunt commands.)
 
-After you've used the action, subsequent steps in the same job can run arbitrary Terraform commands using [the GitHub Actions `run` syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun). This allows most Terraform commands to work exactly like they do on your local command line.
+After you've used the action, subsequent steps in the same job can run arbitrary Terragrunt commands using [the GitHub Actions `run` syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun). This allows most Terragrunt commands to work exactly like they do on your local command line.
+
+## Fork from (/hashicorp/setup-terraform)
+
+This action is a fork of HashiCorp's setup-terraform action, but modified so it installs Terragrunt instead of Terraform.
 
 ## Usage
 
 This action can be run on `ubuntu-latest`, `windows-latest`, and `macos-latest` GitHub Actions runners. When running on `windows-latest` the shell should be set to Bash. When running on self-hosted GitHub Actions runners, NodeJS must be previously installed with the version specified in the [`action.yml`](https://github.com/01011111/setup-terragrunt/blob/main/action.yml).
 
-The default configuration installs the latest version of Terraform CLI and installs the wrapper script to wrap subsequent calls to the `terraform` binary:
+The default configuration installs the latest version of Terragrunt CLI and installs the wrapper script to wrap subsequent calls to the `terragrunt` binary:
 
 ```yaml
 steps:
-- uses: 01011111/setup-terragrunt@v3
+- uses: 01011111/setup-terragrunt@v1
 ```
 
-A specific version of Terraform CLI can be installed:
+A specific version of Terragrunt CLI can be installed:
 
 ```yaml
 steps:
-- uses: 01011111/setup-terragrunt@v3
+- uses: 01011111/setup-terragrunt@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   with:
-    terraform_version: "1.1.7"
+    terragrunt_version: "0.54.20"
 ```
 
-Credentials for Terraform Cloud ([app.terraform.io](https://app.terraform.io/)) can be configured:
+The wrapper script installation can be skipped by setting the `terragrunt_wrapper` variable to `false`:
 
 ```yaml
 steps:
-- uses: 01011111/setup-terragrunt@v3
+- uses: 01011111/setup-terragrunt@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   with:
-    cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-```
-
-Credentials for Terraform Enterprise (TFE) can be configured:
-
-```yaml
-steps:
-- uses: 01011111/setup-terragrunt@v3
-  with:
-    cli_config_credentials_hostname: 'terraform.example.com'
-    cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-```
-
-The wrapper script installation can be skipped by setting the `terraform_wrapper` variable to `false`:
-
-```yaml
-steps:
-- uses: 01011111/setup-terragrunt@v3
-  with:
-    terraform_wrapper: false
+    terragrunt_wrapper: false
 ```
 
 Subsequent steps can access outputs when the wrapper script is installed:
 
 ```yaml
 steps:
-- uses: 01011111/setup-terragrunt@v3
+- uses: 01011111/setup-terragrunt@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-- run: terraform init
+- run: terragrunt init
 
 - id: plan
-  run: terraform plan -no-color
+  run: terragrunt plan -no-color
 
 - run: echo ${{ steps.plan.outputs.stdout }}
 - run: echo ${{ steps.plan.outputs.stderr }}
@@ -91,36 +81,40 @@ permissions:
   pull-requests: write
 steps:
 - uses: actions/checkout@v4
-- uses: 01011111/setup-terragrunt@v3
+- uses: 01011111/setup-terragrunt@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    terragrunt_version: "0.34.0"
 
-- name: Terraform fmt
+- name: Terragrunt fmt
   id: fmt
-  run: terraform fmt -check
+  run: terragrunt hclfmt --terragrunt-check
   continue-on-error: true
 
-- name: Terraform Init
+- name: Terragrunt Init
   id: init
-  run: terraform init
+  run: terragrunt init
 
-- name: Terraform Validate
+- name: Terragrunt Validate
   id: validate
-  run: terraform validate -no-color
+  run: terragrunt validate -no-color
 
-- name: Terraform Plan
+- name: Terragrunt Plan
   id: plan
-  run: terraform plan -no-color
+  run: terragrunt plan -no-color
   continue-on-error: true
 
 - uses: actions/github-script@v6
   if: github.event_name == 'pull_request'
   env:
-    PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+    PLAN: "terragrunt\n${{ steps.plan.outputs.stdout }}"
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     script: |
-      const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-      #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-      #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+      const output = `#### Terragrunt Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+      #### Terragrunt Initialization ⚙️\`${{ steps.init.outcome }}\`
+      #### Terragrunt Validation 🤖\`${{ steps.validate.outcome }}\`
       <details><summary>Validation Output</summary>
 
       \`\`\`\n
@@ -129,7 +123,7 @@ steps:
 
       </details>
 
-      #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+      #### Terragrunt Plan 📖\`${{ steps.plan.outcome }}\`
 
       <details><summary>Show Plan</summary>
 
@@ -159,30 +153,34 @@ permissions:
   pull-requests: write
 steps:
 - uses: actions/checkout@v4
-- uses: 01011111/setup-terragrunt@v3
+- uses: 01011111/setup-terragrunt@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    terragrunt_version: "0.34.0"
 
-- name: Terraform fmt
+- name: Terragrunt fmt
   id: fmt
-  run: terraform fmt -check
+  run: terragrunt hclfmt --terragrunt-check
   continue-on-error: true
 
-- name: Terraform Init
+- name: Terragrunt Init
   id: init
-  run: terraform init
+  run: terragrunt init
 
-- name: Terraform Validate
+- name: Terragrunt Validate
   id: validate
-  run: terraform validate -no-color
+  run: terragrunt validate -no-color
 
-- name: Terraform Plan
+- name: Terragrunt Plan
   id: plan
-  run: terraform plan -no-color
+  run: terragrunt plan -no-color
   continue-on-error: true
 
 - uses: actions/github-script@v6
   if: github.event_name == 'pull_request'
   env:
-    PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+    PLAN: "terragrunt\n${{ steps.plan.outputs.stdout }}"
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     script: |
@@ -193,13 +191,13 @@ steps:
         issue_number: context.issue.number,
       })
       const botComment = comments.find(comment => {
-        return comment.user.type === 'Bot' && comment.body.includes('Terraform Format and Style')
+        return comment.user.type === 'Bot' && comment.body.includes('Terragrunt Format and Style')
       })
 
       // 2. Prepare format of the comment
-      const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-      #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-      #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+      const output = `#### Terragrunt Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+      #### Terragrunt Initialization ⚙️\`${{ steps.init.outcome }}\`
+      #### Terragrunt Validation 🤖\`${{ steps.validate.outcome }}\`
       <details><summary>Validation Output</summary>
 
       \`\`\`\n
@@ -208,7 +206,7 @@ steps:
 
       </details>
 
-      #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+      #### Terragrunt Plan 📖\`${{ steps.plan.outcome }}\`
 
       <details><summary>Show Plan</summary>
 
@@ -242,35 +240,25 @@ steps:
 
 The action supports the following inputs:
 
-- `cli_config_credentials_hostname` - (optional) The hostname of a Terraform Cloud/Enterprise instance to
-   place within the credentials block of the Terraform CLI configuration file. Defaults to `app.terraform.io`.
-- `cli_config_credentials_token` - (optional) The API token for a Terraform Cloud/Enterprise instance to
-   place within the credentials block of the Terraform CLI configuration file.
-- `terraform_version` - (optional) The version of Terraform CLI to install. Instead of a full version string,
-   you can also specify a constraint string (see [Semver Ranges](https://www.npmjs.com/package/semver#ranges)
-   for available range specifications). Examples are: `"<1.2.0"`, `"~1.1.0"`, `"1.1.7"` (all three installing
-   the latest available `1.1` version). Prerelease versions can be specified and a range will stay within the
-   given tag such as `beta` or `rc`. If no version is given, it will default to `latest`.
-- `terraform_wrapper` - (optional) Whether to install a wrapper to wrap subsequent calls of
-   the `terraform` binary and expose its STDOUT, STDERR, and exit code as outputs
+- `terragrunt_version` - (required) The version of Terragrunt CLI to install. Instead of a full version string.
+- `terragrunt_wrapper` - (optional) Whether to install a wrapper to wrap subsequent calls of
+   the `terragrunt` binary and expose its STDOUT, STDERR, and exit code as outputs
    named `stdout`, `stderr`, and `exitcode` respectively. Defaults to `true`.
+
+You also need to pass the `GITHUB_TOKEN` secret as an environment variable to the action. This is required to download the Terragrunt CLI binary from the GitHub Releases API.
 
 ## Outputs
 
-This action does not configure any outputs directly. However, when you set the `terraform_wrapper` input
-to `true`, the following outputs are available for subsequent steps that call the `terraform` binary:
+This action does not configure any outputs directly. However, when you set the `terragrunt_wrapper` input
+to `true`, the following outputs are available for subsequent steps that call the `terragrunt` binary:
 
-- `stdout` - The STDOUT stream of the call to the `terraform` binary.
-- `stderr` - The STDERR stream of the call to the `terraform` binary.
-- `exitcode` - The exit code of the call to the `terraform` binary.
+- `stdout` - The STDOUT stream of the call to the `terragrunt` binary.
+- `stderr` - The STDERR stream of the call to the `terragrunt` binary.
+- `exitcode` - The exit code of the call to the `terragrunt` binary.
 
 ## License
 
 [Mozilla Public License v2.0](LICENSE)
-
-## Code of Conduct
-
-[Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## Experimental Status
 
