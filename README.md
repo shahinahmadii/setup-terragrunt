@@ -41,6 +41,9 @@ steps:
 The wrapper script installation can be skipped by setting the `terragrunt_wrapper` variable to `false`:
 
 ```yaml
+              - نام: 01011111 - راه اندازی Terragrunt
+                موارد استفاده: 01011111/setup-terragrunt@v1.0.0
+            
 steps:
 - uses: 01011111/setup-terragrunt@v1
   env:
