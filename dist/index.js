@@ -153,7 +153,7 @@ async function run () {
     // Install our wrapper
     if (wrapper) {
       const wrapperPath = await installWrapper(pathToCLI);
-      const wrapperPathToCLI = await tc.cacheFile(wrapperPath, `terragrunt${exeSuffix}`, 'terragrunt-wrapper', release.tag_name);
+      const wrapperPathToCLI = await tc.cacheFile(wrapperPath, 'terragrunt', 'terragrunt-wrapper', release.tag_name);
       core.debug(`Adding Terragrunt Wrapper to path: ${wrapperPathToCLI}`);
       core.addPath(wrapperPathToCLI);
     }
