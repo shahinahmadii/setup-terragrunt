@@ -17,6 +17,7 @@
 const os = __nccwpck_require__(2037);
 const path = __nccwpck_require__(1017);
 const semver = __nccwpck_require__(1383);
+const fs = (__nccwpck_require__(7147).promises);
 
 // External
 const { Octokit } = process.env.GITHUB_ACTION ? __nccwpck_require__(1231) : __nccwpck_require__(5375);
@@ -61,6 +62,8 @@ function getBuild (release, platform, arch) {
 async function downloadCLI (url) {
   core.debug(`Downloading Terragrunt CLI from ${url}`);
   const pathToCLI = await tc.downloadTool(url);
+
+  await fs.chmod(pathToCLI, '755');
 
   core.debug(`Terragrunt CLI path is ${pathToCLI}.`);
 
