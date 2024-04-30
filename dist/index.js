@@ -79,11 +79,13 @@ async function downloadCLI (url) {
 
 async function installWrapper (pathToCLI) {
   let source, target, wrapperPath;
+  // If we're on Windows, then the executable ends with .exe
+  const exeSuffix = os.platform().startsWith('win') ? '.exe' : '';
 
   // Install our wrapper as terragrunt
   try {
     source = __nccwpck_require__.ab + "index1.js";
-    target = path.resolve(['terragrunt'].join(path.sep));
+    target = path.resolve([`terragrunt${exeSuffix}`].join(path.sep));
     core.debug(`Copying ${source} to ${target}.`);
     await io.cp(__nccwpck_require__.ab + "index1.js", target);
     wrapperPath = target;
