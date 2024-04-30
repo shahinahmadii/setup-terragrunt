@@ -29,13 +29,11 @@ jobs:
       with:
         terragrunt_version: ${{ matrix['terragrunt-versions'] }}
 
-    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
-      if: ${{ matrix['terragrunt-versions'] != 'latest' }}
-      run: terragrunt version | grep ${{ matrix['terragrunt-versions']}}
+    - name: Validate Terragrunt Version - ${{ matrix['terragrunt-versions'] }}
+      run: terragrunt -version | grep ${{ matrix['terragrunt-versions']}}
 
-    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
-      if: ${{ matrix['terragrunt-versions'] == 'latest' }}
-      run: terragrunt version | grep 'Terragrunt v'
+    - name: Validate Terragrunt Version - ${{ matrix['terragrunt-versions'] }}
+      run: terragrunt -version | grep 'terragrunt version v'
 
   terragrunt-versions-no-wrapper:
     name: 'Terragrunt Versions No Wrapper'
@@ -56,13 +54,11 @@ jobs:
         terragrunt_version: ${{ matrix['terragrunt-versions'] }}
         terragrunt_wrapper: false
 
-    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
-      if: ${{ matrix['terragrunt-versions'] != 'latest' }}
-      run: terragrunt version | grep ${{ matrix['terragrunt-versions']}}
+    - name: Validate Terragrunt Version - ${{ matrix['terragrunt-versions'] }}
+      run: terragrunt -version | grep ${{ matrix['terragrunt-versions']}}
 
-    - name: Validate Teraform Version - ${{ matrix['terragrunt-versions'] }}
-      if: ${{ matrix['terragrunt-versions'] == 'latest' }}
-      run: terragrunt version | grep 'Terragrunt v'
+    - name: Validate Terragrunt Version - ${{ matrix['terragrunt-versions'] }}
+      run: terragrunt -version | grep 'terragrunt version v'
 
   terragrunt-arguments:
     name: 'Terragrunt Arguments'
