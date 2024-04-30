@@ -132,9 +132,10 @@ async function run () {
     // Install our wrapper
     if (wrapper) {
       await installWrapper(pathToCLI, cachedPath);
+      core.debug(`Adding to path: ${pathToCLI}`);
       core.addPath(pathToCLI);
     } else {
-      // Add to path
+      core.debug(`Adding to path: ${cachedPath}`);
       core.addPath(cachedPath);
     }
 

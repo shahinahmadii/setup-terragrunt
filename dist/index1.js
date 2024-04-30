@@ -27951,6 +27951,7 @@ const pathToCLI = __nccwpck_require__(5828);
 async function checkTerragrunt () {
   // Setting check to `true` will cause `which` to throw if terragrunt isn't found
   const check = true;
+  core.debug(`Path to bin: ${pathToCLI}`);
   return io.which(pathToCLI, check);
 }
 
@@ -27973,6 +27974,7 @@ async function checkTerragrunt () {
     ignoreReturnCode: true,
     silent: true // avoid printing command in stdout: https://github.com/actions/toolkit/issues/649
   };
+  core.debug(`Executing terragrunt at ${pathToCLI} with args: ${args.join(' ')}`);
   const exitCode = await exec(pathToCLI, args, options);
 
   // Pass-through stdout/err as `exec` won't due to `silent: true` option
