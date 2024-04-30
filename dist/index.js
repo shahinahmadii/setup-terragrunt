@@ -83,10 +83,10 @@ async function installWrapper (pathToCLI) {
   // Install our wrapper as terragrunt
   try {
     source = __nccwpck_require__.ab + "index1.js";
-    target = path.resolve([__dirname, '..', 'wrapper', 'terragrunt'].join(path.sep));
+    target = path.resolve(['terragrunt'].join(path.sep));
     core.debug(`Copying ${source} to ${target}.`);
     await io.cp(__nccwpck_require__.ab + "index1.js", target);
-    wrapperPath = target;
+    wrapperPath = path.resolve(__dirname);
   } catch (e) {
     core.error(`Unable to copy ${source} to ${target}.`);
     throw e;
