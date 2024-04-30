@@ -51,6 +51,8 @@ jobs:
           args: merge
       - name: Git push changelog
         run: |
+          git config --global user.email "6258960+ctrlaltdev@users.noreply.github.com"
+          git config --global user.name "CTRLALTDEV Bot"
           git add .
           git commit -a -m "Update changelog"
           git push
@@ -78,6 +80,8 @@ jobs:
         run: npm version "${{ inputs.versionNumber }}" --git-tag-version false
       - name: Git push
         run: |
+          git config --global user.email "6258960+ctrlaltdev@users.noreply.github.com"
+          git config --global user.name "CTRLALTDEV Bot"
           git add .
           git commit -a -m "Update package version"
           git push
@@ -99,6 +103,8 @@ jobs:
 
       - name: Git push release tag
         run: |
+          git config --global user.email "6258960+ctrlaltdev@users.noreply.github.com"
+          git config --global user.name "CTRLALTDEV Bot"
           git tag "${{ inputs.versionNumber }}"
           git tag -f "${{ needs.major-version.outputs.version }}"
           git push "${{ inputs.versionNumber }}"
