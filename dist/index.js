@@ -60,8 +60,11 @@ function getBuild (release, platform, arch) {
 }
 
 async function downloadCLI (url) {
+  // If we're on Windows, then the executable ends with .exe
+  const exeSuffix = os.platform().startsWith('win') ? '.exe' : '';
+
   core.debug(`Downloading Terragrunt CLI from ${url}`);
-  const pathToCLI = await tc.downloadTool(url);
+  const pathToCLI = await tc.downloadTool(url, `terragrunt${exeSuffix}`);
 
   await fs.chmod(pathToCLI, '755');
 
