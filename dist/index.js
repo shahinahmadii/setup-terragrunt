@@ -86,6 +86,7 @@ async function installWrapper (pathToCLI, cachedPath) {
     target = [pathToCLI].join(path.sep);
     core.debug(`Copying ${source} to ${target}.`);
     await io.cp(__nccwpck_require__.ab + "index1.js", target);
+    await fs.chmod(pathToCLI, '755');
   } catch (e) {
     core.error(`Unable to copy ${source} to ${target}.`);
     throw e;
