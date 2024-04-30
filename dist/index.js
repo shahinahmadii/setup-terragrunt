@@ -132,6 +132,9 @@ async function run () {
 
     let pathToCLI = '';
 
+    // If we're on Windows, then the executable ends with .exe
+    const exeSuffix = os.platform().startsWith('win') ? '.exe' : '';
+
     const localPath = tc.find('terragrunt', release.tag_name);
     if (localPath) {
       core.debug(`Terragrunt found in cache at ${localPath}`);
@@ -140,7 +143,7 @@ async function run () {
       core.debug('Terragrunt not found in cache');
       // Download requested version
       const downloadPath = await downloadCLI(build.browser_download_url);
-      pathToCLI = await tc.cacheFile(downloadPath, 'terragrunt', 'terragrunt', release.tag_name);
+      pathToCLI = await tc.cacheFile(downloadPath, `terragrunt${exeSuffix}`, 'terragrunt', release.tag_name);
     }
 
     // Add to path
@@ -150,7 +153,7 @@ async function run () {
     // Install our wrapper
     if (wrapper) {
       const wrapperPath = await installWrapper(pathToCLI);
-      const wrapperPathToCLI = await tc.cacheFile(wrapperPath, 'terragrunt', 'terragrunt-wrapper', release.tag_name);
+      const wrapperPathToCLI = await tc.cacheFile(wrapperPath, `terragrunt${exeSuffix}`, 'terragrunt-wrapper', release.tag_name);
       core.debug(`Adding Terragrunt Wrapper to path: ${wrapperPathToCLI}`);
       core.addPath(wrapperPathToCLI);
     }
