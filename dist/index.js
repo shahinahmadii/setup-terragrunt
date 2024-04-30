@@ -86,7 +86,7 @@ async function installWrapper (pathToCLI) {
     target = path.resolve(['terragrunt'].join(path.sep));
     core.debug(`Copying ${source} to ${target}.`);
     await io.cp(__nccwpck_require__.ab + "index1.js", target);
-    wrapperPath = path.resolve(__dirname);
+    wrapperPath = target;
   } catch (e) {
     core.error(`Unable to copy ${source} to ${target}.`);
     throw e;
@@ -141,15 +141,16 @@ async function run () {
       pathToCLI = await tc.cacheFile(downloadPath, 'terragrunt', 'terragrunt', release.tag_name);
     }
 
+    // Add to path
+    core.debug(`Adding Terragrunt CLI to path: ${pathToCLI}`);
+    core.addPath(pathToCLI);
+
     // Install our wrapper
     if (wrapper) {
       const wrapperPath = await installWrapper(pathToCLI);
-      core.debug(`Adding Terragrunt Wrapper to path: ${wrapperPath}`);
-      core.addPath(wrapperPath);
-    } else {
-      // Add to path
-      core.debug(`Adding Terragrunt CLI to path: ${pathToCLI}`);
-      core.addPath(pathToCLI);
+      const wrapperPathToCLI = await tc.cacheFile(wrapperPath, 'terragrunt', 'terragrunt-wrapper', release.tag_name);
+      core.debug(`Adding Terragrunt Wrapper to path: ${wrapperPathToCLI}`);
+      core.addPath(wrapperPathToCLI);
     }
 
     return release;
