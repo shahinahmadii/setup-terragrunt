@@ -24,6 +24,8 @@ jobs:
 
     - name: Setup Terragrunt - ${{ matrix['terragrunt-versions'] }}
       uses: ./
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         terragrunt_version: ${{ matrix['terragrunt-versions'] }}
 
@@ -48,6 +50,8 @@ jobs:
 
     - name: Setup Terragrunt (no wrapper) - ${{ matrix['terragrunt-versions'] }}
       uses: ./
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         terragrunt_version: ${{ matrix['terragrunt-versions'] }}
         terragrunt_wrapper: false
@@ -73,6 +77,8 @@ jobs:
 
     - name: Setup Terragrunt
       uses: ./
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         terragrunt_version: ${{ matrix['terragrunt-versions'] }}
 
@@ -107,6 +113,8 @@ jobs:
 
     - name: Setup Terragrunt
       uses: ./
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         terragrunt_wrapper: false
         terragrunt_version: ${{ matrix['terragrunt-versions'] }}
