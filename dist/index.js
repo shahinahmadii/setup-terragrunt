@@ -140,7 +140,7 @@ async function run () {
       await installWrapper(pathToCLI);
     }
 
-    const cachedPath = await tc.cacheDir(pathToCLI, 'terragrunt', release.tag_name);
+    const cachedPath = await tc.cacheFile(pathToCLI, 'terragrunt', 'terragrunt', release.tag_name);
 
     // Add to path
     core.addPath(cachedPath);
