@@ -10,7 +10,7 @@ The `01011111/setup-terragrunt` action is a JavaScript action that sets up Terra
 
 After you've used the action, subsequent steps in the same job can run arbitrary Terragrunt commands using [the GitHub Actions `run` syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun). This allows most Terragrunt commands to work exactly like they do on your local command line.
 
-## Fork from (/hashicorp/setup-terraform)
+## Fork from (hashicorp/setup-terraform)[/hashicorp/setup-terraform]
 
 This action is a fork of HashiCorp's setup-terraform action, but modified so it installs Terragrunt instead of Terraform.
 
@@ -23,6 +23,8 @@ The default configuration installs the latest version of Terragrunt CLI and inst
 ```yaml
 steps:
 - uses: 01011111/setup-terragrunt@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 A specific version of Terragrunt CLI can be installed:
